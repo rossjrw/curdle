@@ -8,15 +8,22 @@ const { word } = getWordOfTheDay()
 const baseUrl = location.origin + location.pathname
 
 let showingAbout = $ref(false)
-function toggleAbout(event: Event) {
+const aboutLink = $ref<HTMLAnchorElement>()
+function toggleAbout(event: MouseEvent) {
   showingAbout = !showingAbout
+
+  // Block navigation from clicking the link
   event.preventDefault()
+
+  // Remove focus so that the next Enter press enters a guess instead of
+  // activating the link via the keyboard
+  aboutLink.blur()
 }
 </script>
 
 <template>
   <header>
-    <a href="#about" id="about-link" @click="toggleAbout">
+    <a href="#about" ref="aboutLink" id="about-link" @click="toggleAbout">
       {{ showingAbout ? "close" : "about" }}
     </a>
     <h1>CURDLE</h1>
