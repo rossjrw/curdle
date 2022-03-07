@@ -270,9 +270,9 @@ p {
   display: grid;
   grid-template-rows: repeat(6, 1fr);
   grid-gap: 5px;
-  padding: 10px;
+  padding: min(1.5vw, 10px);
   box-sizing: border-box;
-  width: min(70%, 90vw);
+  width: min(95%, 350px);
   margin: 0px auto;
   flex: 1;
 }

@@ -19,17 +19,19 @@ body {
   text-align: center;
   max-width: 500px;
   margin: 0px auto;
+  font-size: 16px;
 }
 
 h1 {
-  font-size: 36px;
+  font-size: clamp(22px, 4vh, 36px);
   margin-top: 4px;
   margin-bottom: 0;
 }
 
 h2 {
+  font-size: clamp(16px, 2.5vh, 22px);
   color: var(--present);
-  margin-top: -8px;
+  margin-top: clamp(-4px, 0.75vh, -8px);
   margin-bottom: 4px;
 }
 h2 span {
@@ -38,11 +40,12 @@ h2 span {
 
 header {
   border-bottom: 1px solid #ccc;
-  margin-bottom: 0.5em;
+  margin-bottom: min(1vh, 0.5em);
   position: relative;
 }
 
 #source-link {
+  font-size: clamp(16px, 2.5vh, 22px);
   position: absolute;
   right: 1em;
   top: 0.5em;
