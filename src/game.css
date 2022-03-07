@@ -44,11 +44,17 @@ header {
   position: relative;
 }
 
-#source-link {
+#source-link,
+#about-link {
   font-size: clamp(16px, 2.5vh, 22px);
   position: absolute;
-  right: 1em;
   top: 0.5em;
+}
+#source-link {
+  right: 1em;
+}
+#about-link {
+  left: 1em;
 }
 
 .correct,
