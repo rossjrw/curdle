@@ -19,8 +19,8 @@
     <ul>
       <li>
         <b>{{ indications.common }}:</b><br />
-        This word either <i>already has been</i> or <i>one day will be</i> be
-        the day's official Wordle answer (unless Wordle's answer list changes).
+        This word either <i>already has been</i> or <i>one day will be</i> the
+        day's official Wordle answer (unless Wordle's answer list changes).
         There are {{ dictionary.common.length.toLocaleString() }} such words.
       </li>
       <li>
