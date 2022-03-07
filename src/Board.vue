@@ -228,8 +228,13 @@ function completeRow() {
       }
     })
 
-    // Cache game state
-    localStorage.setItem(gameId, JSON.stringify(board))
+    try {
+      // Cache game state
+      localStorage.setItem(gameId, JSON.stringify(board))
+    } catch (error) {
+      // Could fail because e.g. private browsing - not important
+      console.error(error)
+    }
 
     allowInput = false
     if (currentRow.every((tile) => tile.state === LetterState.CORRECT)) {
