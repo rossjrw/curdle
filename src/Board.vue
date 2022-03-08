@@ -83,7 +83,22 @@ const cachedGame = localStorage.getItem(gameId)
 if (cachedGame) {
   board = JSON.parse(cachedGame)
   board.forEach((row) =>
-    row.forEach((tile) => (letterStates[tile.letter] = tile.state))
+    row.forEach((tile) => {
+      // Update the letter state only if a) the letter does not already
+      // have a state, or b) the state is a higher priority than the
+      // current one
+      const states = [
+        LetterState.INITIAL,
+        LetterState.ABSENT,
+        LetterState.PRESENT,
+        LetterState.CORRECT,
+      ]
+      if (
+        !(tile.letter in letterStates) ||
+        states.indexOf(tile.state) > states.indexOf(letterStates[tile.letter])
+      )
+        letterStates[tile.letter] = tile.state
+    })
   )
   if (
     board.some((row) => row.every((tile) => tile.state === LetterState.CORRECT))
