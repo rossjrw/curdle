@@ -55,8 +55,10 @@ const props = defineProps({
 let { sender, indicator } = getWordOfTheDay()
 if (indicator == null) indicator = "invalid"
 
+const gameId = recreateGameId(props.answer, sender)
+
 // Board state. Each tile is represented as { letter, state }
-const board = $ref(
+let board = $ref(
   Array.from({ length: 6 }, () =>
     Array.from({ length: 5 }, () => ({
       letter: "",
@@ -65,17 +67,40 @@ const board = $ref(
   )
 )
 
+// Keep track of revealed letters for the virtual keyboard
+const letterStates: Record<string, LetterState> = $ref({})
+
+// Handle keyboard input.
+let allowInput = true
+const onKeyup = (e: KeyboardEvent) => onKey(e.key)
+window.addEventListener("keyup", onKeyup)
+onUnmounted(() => {
+  window.removeEventListener("keyup", onKeyup)
+})
+
+// Recover game state from storage if present
+const cachedGame = localStorage.getItem(gameId)
+if (cachedGame) {
+  board = JSON.parse(cachedGame)
+  board.forEach((row) =>
+    row.forEach((tile) => (letterStates[tile.letter] = tile.state))
+  )
+  if (
+    board.some((row) => row.every((tile) => tile.state === LetterState.CORRECT))
+  )
+    gameComplete()
+}
+
 // Feedback state: message and shake
 let message = $ref("")
 let shakeRowIndex = $ref(-1)
 let success = $ref(false)
 
 // Current active row.
-let currentRowIndex = $ref(0)
+let currentRowIndex = $ref(
+  board.findIndex((row) => row[0].state === LetterState.INITIAL)
+)
 const currentRow = $computed(() => board[currentRowIndex])
-
-// Keep track of revealed letters for the virtual keyboard
-const letterStates: Record<string, LetterState> = $ref({})
 
 function showMessage(msg: string, time = 1000) {
   message = msg
@@ -119,14 +144,6 @@ function makeSharePaste() {
   ].join("\n")
 }
 
-// Handle keyboard input.
-let allowInput = true
-const onKeyup = (e: KeyboardEvent) => onKey(e.key)
-window.addEventListener("keyup", onKeyup)
-onUnmounted(() => {
-  window.removeEventListener("keyup", onKeyup)
-})
-
 function onKey(key: string) {
   if (!allowInput) return
   if (/^[a-zA-Z]$/.test(key)) {
@@ -154,6 +171,15 @@ function clearTile() {
       break
     }
   }
+}
+
+function gameComplete() {
+  allowInput = false
+  setTimeout(() => {
+    sharePaste = makeSharePaste()
+    showMessage("Nice", -1)
+    success = true
+  }, 1600)
 }
 
 function completeRow() {
@@ -202,14 +228,18 @@ function completeRow() {
       }
     })
 
+    try {
+      // Cache game state
+      localStorage.setItem(gameId, JSON.stringify(board))
+    } catch (error) {
+      // Could fail because e.g. private browsing - not important
+      console.error(error)
+    }
+
     allowInput = false
     if (currentRow.every((tile) => tile.state === LetterState.CORRECT)) {
       // yay!
-      setTimeout(() => {
-        sharePaste = makeSharePaste()
-        showMessage("Nice", -1)
-        success = true
-      }, 1600)
+      gameComplete()
     } else if (currentRowIndex < board.length - 1) {
       // go the next row
       currentRowIndex++
@@ -240,9 +270,9 @@ p {
   display: grid;
   grid-template-rows: repeat(6, 1fr);
   grid-gap: 5px;
-  padding: 10px;
+  padding: min(1.5vw, 10px);
   box-sizing: border-box;
-  width: min(70%, 90vw);
+  width: min(95%, 350px);
   margin: 0px auto;
   flex: 1;
 }

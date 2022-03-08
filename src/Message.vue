@@ -1,18 +1,20 @@
 <template>
   <Transition>
     <div class="message" v-if="message">
-      <p>{{ copied ? "Copied results to clipboard" : message }}</p>
+      <p>{{ message }}</p>
+      <p v-if="copied">Copied results to clipboard</p>
       <p v-if="paste">
         <textarea readonly ref="textarea">{{ paste }}</textarea>
       </p>
-      <button v-if="paste" @click="copyPaste">Share</button>
+      <p v-if="paste">
+        <button @click="copyPaste">Copy</button>
+        <button v-if="canShare" @click="sharePaste">Share</button>
+      </p>
     </div>
   </Transition>
 </template>
 
 <script setup lang="ts">
-import { nextTick } from "vue"
-
 const textarea = $ref<HTMLTextAreaElement>()
 
 const props = defineProps({
@@ -26,6 +28,16 @@ function copyPaste() {
   textarea.select()
   document.execCommand("copy")
   copied = true
+}
+
+const canShare = $computed(
+  () =>
+    Boolean(navigator.canShare) &&
+    Boolean(navigator.share) &&
+    navigator.canShare({ text: props.paste })
+)
+function sharePaste() {
+  navigator.share({ text: props.paste })
 }
 </script>
 
@@ -45,5 +57,9 @@ function copyPaste() {
 }
 .message.v-leave-to {
   opacity: 0;
+}
+
+button {
+  padding: 0.5rem;
 }
 </style>
