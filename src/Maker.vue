@@ -2,7 +2,7 @@
   <Message :message="message"></Message>
   <form id="maker" @submit="copyLinkToClipboard">
     <p>Enter a 5-letter word:</p>
-    <p><input type="text" v-model="word" /></p>
+    <p><input type="text" v-model="word" ref="picker"/></p>
     <p class="indicator">{{ indication }}</p>
     <p><b>Optional:</b> Who created this Curdle?</p>
     <p><input type="text" v-model="sender" /></p>
@@ -27,6 +27,7 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from "vue"
 import Message from "./Message.vue"
 import {
   indications,
@@ -44,6 +45,8 @@ let message = $ref("")
 let link = $computed(
   () => `${location.origin}${location.pathname}?game=${gameId}`
 )
+
+const picker = $ref<HTMLInputElement>()
 
 let gameId = $computed(() => {
   word = normaliseWord(word)
@@ -68,6 +71,8 @@ function showMessage(msg: string, time = 1000) {
   message = msg
   if (time > 0) setTimeout(() => (message = ""), time)
 }
+
+onMounted(() => picker.focus())
 </script>
 
 <style scoped>
