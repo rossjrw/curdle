@@ -147,7 +147,7 @@ function makeSharePaste() {
     .map((row) => {
       return row.map((tile) => icons[tile.state]).join("")
     })
-    .join("\n")
+    .join("  \n")
   const gameId = recreateGameId(props.answer, sender)
   const finalIndex = currentRowIndex >= 6 ? "X" : currentRowIndex + 1
   return [
